@@ -1,0 +1,36 @@
+config:
+  target: "http://postman-echo.com/"
+  phases:
+    - duration: 5
+      arrivalRate: 2
+      name: First Echo Test
+    - duration: 5
+      arrivalRate: 6
+      name: First Echo Test
+    - duration: 5
+      arrivalRate: 2
+      name: First Echo Test
+  payload:
+    -
+      path: "keywords.csv"
+      fields:
+        - "keyword1"
+        - "keyword2"
+      order: sequence
+  plugins:
+    ensure:
+      thresholds:
+        - http.response_time.p95: 10
+        - http.response_time.max: 6000
+      conditions:
+        - expression: "http.request_rate >= 2 and http.response_time.max < 600"
+scenarios:
+  - name: Getting an echo
+    flow:
+      - get:
+          url: "{{ target }}get"
+      - post:
+          url: "{{ target }}post"
+          json:
+            foo1: "bar1"
+            foo2: "bar2"
